@@ -97,7 +97,23 @@ if (process.env.NODE_ENV === 'production') {
   const buildPath = path.join(__dirname, '..', 'build');
   if (fs.existsSync(buildPath)) {
     console.log('Servindo arquivos estáticos da pasta build...');
-    app.use(express.static(buildPath));
+    
+    // Configurar tipos MIME específicos para garantir que os arquivos sejam servidos corretamente
+    express.static.mime.define({'application/javascript': ['js']});
+    express.static.mime.define({'text/css': ['css']});
+    
+    // Usar express.static com configurações adicionais
+    app.use(express.static(buildPath, {
+      maxAge: '1y',
+      setHeaders: (res, path) => {
+        if (path.endsWith('.html')) {
+          res.setHeader('Cache-Control', 'public, max-age=0');
+        } else if (path.endsWith('.js') || path.endsWith('.css')) {
+          res.setHeader('Content-Type', path.endsWith('.js') ? 'application/javascript' : 'text/css');
+          res.setHeader('Cache-Control', 'public, max-age=31536000');
+        }
+      }
+    }));
     
     // Todas as outras rotas devem retornar o index.html para SPA
     app.get('*', (req, res) => {
