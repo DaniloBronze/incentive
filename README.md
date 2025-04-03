@@ -1,70 +1,74 @@
-# Getting Started with Create React App
+# Incentive
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Um gerenciador de tarefas e anotações inspirado no Notion, com visual moderno e funcionalidades essenciais para organização pessoal.
 
-## Available Scripts
+## Recursos
 
-In the project directory, you can run:
+- **Dashboard**: Visão geral de tarefas e notas recentes
+- **Notas**: Crie, edite e organize suas anotações importantes com formatação Markdown
+- **Tarefas**: Gerencie suas tarefas com prioridades, categorias, etiquetas e status
 
-### `npm start`
+## Tecnologias Utilizadas
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- React com Material UI para uma interface moderna
+- Prisma ORM para acesso ao banco de dados PostgreSQL
+- Express para o backend API
+- Editor de Markdown personalizado para formatação de texto
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Requisitos
 
-### `npm test`
+- Node.js 14+ e npm
+- Banco de dados PostgreSQL (recomendamos Neon.tech, Railway ou Supabase)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Começando
 
-### `npm run build`
+1. Clone o repositório
+2. Instale as dependências com `npm install`
+3. Configure o arquivo `.env` com suas variáveis de ambiente (veja `.env.example`)
+4. Execute as migrações do banco de dados com `npx prisma migrate dev`
+5. Inicie o aplicativo com `npm run dev`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Scripts Disponíveis
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- `npm run dev` - Inicia o aplicativo em modo de desenvolvimento (frontend e backend)
+- `npm start` - Inicia apenas o frontend
+- `npm run api` - Inicia apenas o backend API
+- `npm run build` - Cria a versão de produção do frontend
+- `npm run vercel-build` - Script de build para deploy na Vercel
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Deploy na Vercel
 
-### `npm run eject`
+Este projeto está configurado para deploy na Vercel. Para mais detalhes, consulte o arquivo [vercel-deploy.md](vercel-deploy.md).
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Estrutura do Projeto
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- `/api` - Backend API Express
+  - `/routes` - Rotas da API
+- `/prisma` - Configuração e migrações do Prisma
+- `/public` - Arquivos estáticos públicos
+- `/src` - Código fonte do frontend
+  - `/components` - Componentes reutilizáveis
+  - `/contexts` - Contextos React
+  - `/pages` - Páginas principais da aplicação
+  - `/services` - Serviços para comunicação com a API
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Funcionalidades
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Notas
+- Criar, editar e excluir notas
+- Formatação em Markdown com editor visual 
+- Fixar notas importantes
+- Pesquisar por texto
 
-## Learn More
+### Tarefas
+- Adicionar, editar e excluir tarefas
+- Marcar tarefas como concluídas
+- Definir prioridade (baixa, média, alta)
+- Organizar por categorias e etiquetas
+- Filtrar por status
+- Pesquisar por texto
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Dashboard
+- Visualizar progresso das tarefas
+- Ver tarefas pendentes
+- Acessar notas recentes
