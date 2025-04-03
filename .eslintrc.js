@@ -23,7 +23,9 @@ module.exports = {
     // Ignore findDOMNode deprecation warning
     'react/no-find-dom-node': 'off',
     'react/prop-types': 'off',
-    'react/display-name': 'off'
+    'react/display-name': 'off',
+    // Ignorar variáveis não utilizadas
+    'no-unused-vars': 'warn'
   },
   settings: {
     react: {
