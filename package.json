@@ -35,7 +35,8 @@
     "eject": "react-scripts eject",
     "api": "node api/server.js",
     "dev": "concurrently \"npm run start\" \"npm run api\"",
-    "vercel-build": "node vercel-build.js && CI=false PUBLIC_URL=/ npm run build"
+    "vercel-build": "node vercel-build.js && CI=false PUBLIC_URL=/ npm run build",
+    "start:prod": "node api/server.js"
   },
   "eslintConfig": {
     "extends": [

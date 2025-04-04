@@ -43,13 +43,36 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+// Configurar CORS para permitir requisições de qualquer origem na Vercel
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://incentive-kappa.vercel.app', 'https://incentive.vercel.app', /\.vercel\.app$/]
+    : 'http://localhost:3000',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
-// Adicionar prisma ao request
-app.use((req, res, next) => {
-  req.prisma = prisma;
-  next();
+// Verificar conexão com o banco de dados
+app.use(async (req, res, next) => {
+  try {
+    // Verifica se o banco de dados está acessível
+    await prisma.$queryRaw`SELECT 1`;
+    console.log('Conexão com o banco de dados estabelecida com sucesso');
+    // Adiciona prisma à requisição
+    req.prisma = prisma;
+    next();
+  } catch (error) {
+    console.error('Erro ao conectar ao banco de dados:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro de conexão com o banco de dados',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
 });
 
 // Middleware para logging de requests
@@ -80,6 +103,7 @@ if (tagRoutes) {
 app.get('/api', (req, res) => {
   res.json({ 
     message: 'API Incentive funcionando!',
+    environment: process.env.NODE_ENV,
     routes: [
       '/api/auth',
       '/api/users',

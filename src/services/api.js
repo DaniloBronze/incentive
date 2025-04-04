@@ -1,9 +1,7 @@
 import axios from 'axios';
 
 // Determinar a URL da API baseada no ambiente
-const API_URL = process.env.NODE_ENV === 'production'
-  ? '/api' // Na Vercel, usaremos caminhos relativos
-  : 'http://localhost:5000/api';
+const API_URL = '/api';
 
 // Cria uma instância do axios com baseURL
 const api = axios.create({
@@ -11,6 +9,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true
 });
 
 // Interceptor para incluir userId em todas as requisições
