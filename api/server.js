@@ -3,12 +3,92 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('DATABASE_URL:', process.env.DATABASE_URL ? 'Configurado (URL escondida por segurança)' : 'NÃO CONFIGURADO');
 console.log('PORT:', process.env.PORT || 5000);
 
+// Importações necessárias
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { PrismaClient } = require('@prisma/client');
 const fs = require('fs');
 const path = require('path');
+
+// Verificar ambiente Prisma
+try {
+  console.log('Verificando ambiente Prisma...');
+  console.log('__dirname:', __dirname);
+  console.log('node_modules path:', path.join(__dirname, '..', 'node_modules', '@prisma'));
+  console.log('Prisma client files:', 
+    fs.existsSync(path.join(__dirname, '..', 'node_modules', '@prisma', 'client')) ? 
+    'Encontrado' : 'NÃO ENCONTRADO');
+  
+  // Verificar se schema.prisma existe
+  const schemaPath = path.join(__dirname, '..', 'prisma', 'schema.prisma');
+  console.log('schema.prisma path:', schemaPath);
+  console.log('schema.prisma exists:', fs.existsSync(schemaPath) ? 'Sim' : 'Não');
+  
+  if (fs.existsSync(schemaPath)) {
+    console.log('schema.prisma content:');
+    const schemaContent = fs.readFileSync(schemaPath, 'utf8');
+    console.log(schemaContent.substring(0, 500) + '...'); // Mostrar primeiros 500 caracteres
+  }
+  
+  // Verificar .env
+  const envPath = path.join(__dirname, '..', '.env');
+  console.log('.env path:', envPath);
+  console.log('.env exists:', fs.existsSync(envPath) ? 'Sim' : 'Não');
+  
+  if (fs.existsSync(envPath)) {
+    console.log('.env content (sem mostrar valores):');
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    // Mostrar apenas nomes das variáveis, não os valores
+    const envVars = envContent.split('\n').map(line => {
+      const parts = line.split('=');
+      if (parts.length >= 2) {
+        return parts[0] + '=[valor escondido]';
+      }
+      return line;
+    }).join('\n');
+    console.log(envVars);
+  }
+} catch (error) {
+  console.error('Erro ao verificar ambiente Prisma:', error);
+}
+
+// Inicializar Prisma Client com tratamento de erro
+let prisma;
+try {
+  console.log('Tentando importar PrismaClient...');
+  const { PrismaClient } = require('@prisma/client');
+  console.log('PrismaClient importado com sucesso');
+  
+  console.log('Tentando instanciar PrismaClient...');
+  prisma = new PrismaClient();
+  console.log('PrismaClient instanciado com sucesso');
+} catch (error) {
+  console.error('ERRO AO INICIALIZAR PRISMA CLIENT:', error);
+  console.error('Detalhes:', {
+    code: error.code,
+    clientVersion: error.clientVersion,
+    message: error.message,
+    stack: error.stack
+  });
+  
+  console.log('Criando um mock do PrismaClient para permitir operações básicas...');
+  // Mock do PrismaClient para permitir que a aplicação continue funcionando
+  prisma = {
+    $queryRaw: async () => {
+      throw new Error('Banco de dados indisponível');
+    },
+    $disconnect: async () => {
+      console.log('Mock disconnect chamado');
+    },
+    user: {
+      findUnique: async () => null,
+      count: async () => 0,
+      create: async () => ({})
+    }
+  };
+  
+  console.log('Mock do PrismaClient criado');
+}
 
 // Verificar se os arquivos de rotas existem
 console.log('Verificando arquivos de rotas...');
@@ -44,7 +124,6 @@ try {
 
 // Inicializar app
 const app = express();
-const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -81,11 +160,20 @@ app.use(async (req, res, next) => {
       console.error('Meta do erro:', error.meta);
     }
     
-    res.status(500).json({
-      success: false,
-      message: 'Erro de conexão com o banco de dados',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Erro de banco de dados'
-    });
+    // Se a rota for de login, podemos continuar (nessa rota temos fallback para o usuário admin)
+    if (req.path === '/api/auth/login') {
+      console.log('Login request detectado, continuando com fallback...');
+      req.prisma = prisma;
+      next();
+    } else {
+      // Outras rotas retornam erro
+      res.status(500).json({
+        success: false,
+        message: 'Erro de conexão com o banco de dados',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Erro de banco de dados',
+        userMessage: 'O banco de dados está indisponível no momento. Tente fazer login com admin@example.com / admin123.'
+      });
+    }
   }
 });
 
@@ -118,6 +206,11 @@ app.get('/api', (req, res) => {
   res.json({ 
     message: 'API Incentive funcionando!',
     environment: process.env.NODE_ENV,
+    prismaStatus: prisma.hasOwnProperty('$queryRaw') ? 'Configurado' : 'Não disponível',
+    databaseStatus: req.dbConnected ? 'Conectado' : 'Desconectado (usando fallback)',
+    adminFallback: true,
+    adminUser: 'admin@example.com',
+    adminPassword: 'admin123',
     routes: [
       '/api/auth',
       '/api/users',
@@ -201,6 +294,7 @@ app.listen(PORT, async () => {
     }
   } catch (error) {
     console.error('Erro ao verificar/criar usuário padrão:', error);
+    console.log('Não foi possível criar o usuário padrão. Use admin@example.com / admin123 para login de fallback.');
   }
 });
 

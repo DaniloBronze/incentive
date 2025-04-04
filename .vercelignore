@@ -1,0 +1,17 @@
+# Ignorar arquivos desnecessários no deploy
+node_modules
+.git
+.github
+.vscode
+.idea
+
+# Não ignorar prisma, precisamos dele para o build
+# prisma
+
+# Ignorar arquivos de teste
+**/*.test.js
+**/*.spec.js
+
+# Ignorar arquivos de desenvolvimento
+.env.local
+.env.development 

@@ -35,8 +35,9 @@
     "eject": "react-scripts eject",
     "api": "node api/server.js",
     "dev": "concurrently \"npm run start\" \"npm run api\"",
-    "vercel-build": "node vercel-build.js && CI=false PUBLIC_URL=/ npm run build",
-    "start:prod": "node api/server.js"
+    "vercel-build": "node vercel-build.js && node prisma/generate.js && CI=false PUBLIC_URL=/ npm run build",
+    "start:prod": "node api/server.js",
+    "prisma:generate": "node prisma/generate.js"
   },
   "eslintConfig": {
     "extends": [
