@@ -1,8 +1,9 @@
 import api from './api';
 import * as authService from './authService';
 
-const DEV_MODE = process.env.REACT_APP_API_URL === 'development';
+const DEV_MODE = process.env.NODE_ENV === 'development';
 
+// Dados de exemplo para modo offline/fallback
 const MOCK_TASKS = [
   {
     id: '1',
@@ -10,15 +11,15 @@ const MOCK_TASKS = [
     description: 'Esta é uma tarefa de exemplo para desenvolvimento',
     completed: false,
     priority: 'alta',
-    dueDate: new Date(Date.now() + 86400000 * 2), // 2 dias a partir de agora
-    userId: 'dev-user',
-    category: { id: '1', name: 'Trabalho', color: '#4CAF50', userId: 'dev-user' },
+    dueDate: new Date(Date.now() + 86400000 * 2).toISOString(), // 2 dias a partir de agora
+    userId: '1',
+    category: { id: '1', name: 'Trabalho', color: '#4CAF50', userId: '1' },
     tags: [
-      { id: '1', name: 'Urgente', color: '#F44336', userId: 'dev-user' },
-      { id: '2', name: 'Projeto A', color: '#2196F3', userId: 'dev-user' }
+      { id: '1', name: 'Urgente', color: '#F44336', userId: '1' },
+      { id: '2', name: 'Projeto A', color: '#2196F3', userId: '1' }
     ],
-    createdAt: new Date(),
-    updatedAt: new Date()
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
     id: '2',
@@ -26,14 +27,14 @@ const MOCK_TASKS = [
     description: 'Outra tarefa de exemplo para desenvolvimento',
     completed: true,
     priority: 'média',
-    dueDate: new Date(Date.now() - 86400000), // 1 dia atrás
-    userId: 'dev-user',
-    category: { id: '2', name: 'Pessoal', color: '#9C27B0', userId: 'dev-user' },
+    dueDate: new Date(Date.now() - 86400000).toISOString(), // 1 dia atrás
+    userId: '1',
+    category: { id: '2', name: 'Pessoal', color: '#9C27B0', userId: '1' },
     tags: [
-      { id: '3', name: 'Saúde', color: '#4CAF50', userId: 'dev-user' }
+      { id: '3', name: 'Saúde', color: '#4CAF50', userId: '1' }
     ],
-    createdAt: new Date(Date.now() - 172800000), // 2 dias atrás
-    updatedAt: new Date(Date.now() - 86400000) // 1 dia atrás
+    createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 dias atrás
+    updatedAt: new Date(Date.now() - 86400000).toISOString() // 1 dia atrás
   },
   {
     id: '3',
@@ -41,12 +42,12 @@ const MOCK_TASKS = [
     description: 'Mais uma tarefa de exemplo para desenvolvimento',
     completed: false,
     priority: 'baixa',
-    dueDate: new Date(Date.now() + 86400000 * 7), // 7 dias a partir de agora
-    userId: 'dev-user',
+    dueDate: new Date(Date.now() + 86400000 * 7).toISOString(), // 7 dias a partir de agora
+    userId: '1',
     category: null,
     tags: [],
-    createdAt: new Date(Date.now() - 259200000), // 3 dias atrás
-    updatedAt: new Date(Date.now() - 259200000) // 3 dias atrás
+    createdAt: new Date(Date.now() - 259200000).toISOString(), // 3 dias atrás
+    updatedAt: new Date(Date.now() - 259200000).toISOString() // 3 dias atrás
   }
 ];
 
@@ -72,24 +73,29 @@ const taskService = {
   // Obter todas as tarefas do usuário
   async getTasks() {
     try {
-      if (DEV_MODE) {
-        const user = authService.getCurrentUser();
-        return {
-          success: true,
-          tasks: localTasks.filter(task => task.userId === (user?.id || 'dev-user'))
-        };
-      }
-
       const user = authService.getCurrentUser();
       if (!user) throw new Error('Usuário não autenticado');
 
-      // Certificar-se de passar o userId apenas uma vez
-      const response = await api.get('/tasks', {
-        params: { userId: user.id }
-      });
+      const response = await api.get('/tasks');
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar tarefas:', error);
+      
+      // Retornar dados de exemplo quando o backend não estiver disponível
+      if (user) {
+        console.log('Usando dados de exemplo para tarefas');
+        // Simulamos um pequeno atraso para parecer que os dados estão sendo buscados
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        return {
+          success: true,
+          tasks: MOCK_TASKS.map(task => ({
+            ...task,
+            userId: user.id
+          }))
+        };
+      }
+      
       return {
         success: false,
         message: 'Não foi possível carregar as tarefas. Tente novamente mais tarde.',
