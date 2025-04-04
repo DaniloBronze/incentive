@@ -2,24 +2,52 @@
   "version": 2,
   "builds": [
     {
+      "src": "api/server.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "package.json",
-      "use": "@vercel/node",
+      "use": "@vercel/static-build",
       "config": {
-        "buildCommand": "npm run vercel-build",
-        "outputDirectory": "build"
+        "distDir": "build"
       }
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "api/server.js" },
-    { "src": "/(.*)", "dest": "build/$1" }
+    { 
+      "src": "/api/(.*)", 
+      "dest": "/api/server.js" 
+    },
+    { 
+      "src": "/static/(.*)", 
+      "dest": "/static/$1" 
+    },
+    { 
+      "src": "/manifest.json", 
+      "dest": "/manifest.json" 
+    },
+    { 
+      "src": "/favicon.ico", 
+      "dest": "/favicon.ico" 
+    },
+    { 
+      "src": "/logo(.*).png", 
+      "dest": "/logo$1.png" 
+    },
+    { 
+      "src": "/(.*)\\.js", 
+      "dest": "/$1.js" 
+    },
+    { 
+      "src": "/(.*)\\.css", 
+      "dest": "/$1.css" 
+    },
+    { 
+      "src": "/(.*)", 
+      "dest": "/index.html" 
+    }
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "build": {
-    "env": {
-      "NODE_ENV": "production"
-    }
   }
 } 
