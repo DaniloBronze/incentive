@@ -55,7 +55,7 @@ function Dashboard() {
         }
         
         // Obter notas
-        const notesResult = await noteService.getAllNotes();
+        const notesResult = await noteService.getNotes();
         if (notesResult && notesResult.success) {
           setNotes(notesResult.notes || []);
         } else {

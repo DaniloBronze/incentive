@@ -61,26 +61,27 @@ function Notes() {
     }
   }, [newNoteContent, markdownSource]);
 
-  // Carregar notas do banco de dados
-  useEffect(() => {
-    const fetchNotes = async () => {
-      try {
-        setLoading(true);
-        const result = await noteService.getAllNotes();
-        if (result.success) {
-          setNotes(result.notes);
-          setError(null);
-        } else {
-          setError(result.message || 'Erro ao carregar notas');
-        }
-      } catch (error) {
-        console.error('Erro ao carregar notas:', error);
-        setError('Falha ao carregar notas. Por favor, tente novamente.');
-      } finally {
-        setLoading(false);
+  // Buscar todas as notas
+  const fetchNotes = async () => {
+    try {
+      setLoading(true);
+      const result = await noteService.getNotes();
+      
+      if (result.success) {
+        setNotes(result.notes || []);
+      } else {
+        setError(result.message || 'Erro ao carregar notas');
       }
-    };
+    } catch (err) {
+      setError('Erro ao carregar notas');
+      console.error('Erro ao buscar notas:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Carregar notas quando o componente montar
+  useEffect(() => {
     fetchNotes();
   }, []);
 
