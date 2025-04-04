@@ -6,10 +6,25 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     
+    console.log('Tentativa de login:', { email });
+    
     if (!email || !password) {
       return res.status(400).json({ 
         success: false, 
         message: 'Email e senha são obrigatórios' 
+      });
+    }
+    
+    // Verificar conexão com o banco
+    try {
+      await req.prisma.$queryRaw`SELECT 1`;
+      console.log('Conexão com o banco de dados OK');
+    } catch (dbError) {
+      console.error('Erro na conexão com o banco de dados:', dbError);
+      return res.status(500).json({
+        success: false,
+        message: 'Erro na conexão com o banco de dados',
+        error: process.env.NODE_ENV === 'development' ? dbError.message : undefined
       });
     }
     
@@ -40,9 +55,14 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Erro ao fazer login:', error);
+    console.error('Stack trace:', error.stack);
+    console.error('Prisma error code:', error.code);
+    
     res.status(500).json({ 
       success: false, 
-      message: 'Erro ao fazer login' 
+      message: 'Erro ao fazer login',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      errorCode: error.code
     });
   }
 });
