@@ -1,7 +1,7 @@
 import api from './api';
 import * as authService from './authService';
 
-const DEV_MODE = process.env.REACT_APP_API_URL === 'development';
+const DEV_MODE = process.env.NODE_ENV === 'development';
 
 // Categorias de desenvolvimento
 const DEV_CATEGORIES = [
@@ -44,6 +44,7 @@ const categoryService = {
       console.error('Erro ao buscar categorias:', error);
       
       // Retornar dados de exemplo quando o backend não estiver disponível
+      const user = authService.getCurrentUser();
       if (user) {
         console.log('Usando dados de exemplo para categorias');
         // Simulamos um pequeno atraso para parecer que os dados estão sendo buscados
@@ -84,6 +85,7 @@ const categoryService = {
       console.error('Erro ao buscar categoria:', error);
       
       // Verificar se é uma categoria de exemplo
+      const user = authService.getCurrentUser();
       if (user) {
         const mockCategory = MOCK_CATEGORIES.find(category => category.id === id);
         if (mockCategory) {
@@ -158,6 +160,7 @@ const categoryService = {
       }
       
       // Simular criação de categoria quando o backend não está disponível
+      const user = authService.getCurrentUser();
       if (user) {
         const newCategory = {
           id: Date.now().toString(),

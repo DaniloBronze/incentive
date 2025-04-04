@@ -1,7 +1,7 @@
 import api from './api';
 import * as authService from './authService';
 
-const DEV_MODE = process.env.REACT_APP_API_URL === 'development';
+const DEV_MODE = process.env.NODE_ENV === 'development';
 
 // Etiquetas de desenvolvimento
 const DEV_TAGS = [
@@ -46,6 +46,7 @@ const tagService = {
       console.error('Erro ao buscar etiquetas:', error);
       
       // Retornar dados de exemplo quando o backend não estiver disponível
+      const user = authService.getCurrentUser();
       if (user) {
         console.log('Usando dados de exemplo para etiquetas');
         // Simulamos um pequeno atraso para parecer que os dados estão sendo buscados
@@ -86,6 +87,7 @@ const tagService = {
       console.error('Erro ao buscar etiqueta:', error);
       
       // Verificar se é uma etiqueta de exemplo
+      const user = authService.getCurrentUser();
       if (user) {
         const mockTag = MOCK_TAGS.find(tag => tag.id === id);
         if (mockTag) {
@@ -160,6 +162,7 @@ const tagService = {
       }
       
       // Simular criação de etiqueta quando o backend não está disponível
+      const user = authService.getCurrentUser();
       if (user) {
         const newTag = {
           id: Date.now().toString(),

@@ -82,6 +82,7 @@ const taskService = {
       console.error('Erro ao buscar tarefas:', error);
       
       // Retornar dados de exemplo quando o backend não estiver disponível
+      const user = authService.getCurrentUser();
       if (user) {
         console.log('Usando dados de exemplo para tarefas');
         // Simulamos um pequeno atraso para parecer que os dados estão sendo buscados
