@@ -25,7 +25,9 @@ module.exports = {
     'react/prop-types': 'off',
     'react/display-name': 'off',
     // Ignorar variáveis não utilizadas
-    'no-unused-vars': 'warn'
+    'no-unused-vars': 'warn',
+    // Ignorar variáveis não definidas
+    'no-undef': 'off'
   },
   settings: {
     react: {
