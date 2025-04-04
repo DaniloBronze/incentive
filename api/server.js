@@ -1,3 +1,8 @@
+console.log('Iniciando API Incentive...');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('DATABASE_URL:', process.env.DATABASE_URL ? 'Configurado (URL escondida por segurança)' : 'NÃO CONFIGURADO');
+console.log('PORT:', process.env.PORT || 5000);
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -60,6 +65,7 @@ app.use(bodyParser.json());
 app.use(async (req, res, next) => {
   try {
     // Verifica se o banco de dados está acessível
+    console.log('Tentando conectar ao banco de dados...');
     await prisma.$queryRaw`SELECT 1`;
     console.log('Conexão com o banco de dados estabelecida com sucesso');
     // Adiciona prisma à requisição
@@ -67,10 +73,18 @@ app.use(async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Erro ao conectar ao banco de dados:', error);
+    console.error('Detalhes do erro:', error.message);
+    if (error.code) {
+      console.error('Código do erro:', error.code);
+    }
+    if (error.meta) {
+      console.error('Meta do erro:', error.meta);
+    }
+    
     res.status(500).json({
       success: false,
       message: 'Erro de conexão com o banco de dados',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Erro de banco de dados'
     });
   }
 });
